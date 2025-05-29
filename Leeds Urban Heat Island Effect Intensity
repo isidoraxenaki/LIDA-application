@@ -8,7 +8,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from datetime import datetime
-import matplotlib as mpl
 
 #Read csv file for all stations (Field Measurements)
 met_data = pd.read_csv('C:/Users/user/Desktop/Observation of Weather and Climate/All_Stations_Data.csv', delimiter= ';')
