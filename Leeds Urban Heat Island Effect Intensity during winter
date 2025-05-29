@@ -1,4 +1,4 @@
-#This code aims to calculate the difference of a 4-month average temperature across the diurnal cycle between a rural site and a suburban site station in Leeds (Urban Heat Island Effect)
+#This code aims to calculate the difference of a 4-month average (12/11/24 - 09/03/25) temperature across the diurnal cycle between a rural site and a suburban site station in Leeds (Urban Heat Island Effect)
 #The rural site is an average of nine weather stations (colour names) placed in Leeds SPEN Farm within different microenvironments (e.g., woodland, soil field, grass field, next to A64 road ect.)
 #and they were placed there as part of a master's research project module
 #The suburban site is located in Parnaby Road, close to the city center, and it consists of a Met Office weather observation remote network
