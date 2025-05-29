@@ -1,0 +1,81 @@
+# The code aims to calculate the Monthly mean Northern Hemisphere mid-latitude temperatures for the Last Glacial Maximum and the Modern Period (data is sourcing from coursework)
+
+#Essential Packages
+import numpy as np
+import matplotlib.pyplot as plt
+import glob
+from netCDF4 import Dataset
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
+
+#Create a filepath for each period to access the near-surface temperature values
+LGM_filepath = '/datadrive/coursework/teadv3/climatology/pcpd/teadva.pdcl' #Last Glacial Maximum (LGM) period
+MOD_filepath ='/datadrive/coursework/teada3/climatology/pcpd/teadaa.pdcl' #Modern period
+
+#Create a list of months
+months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec']
+
+#Create 2 empty lists to return the results
+LGM = []
+MOD = []
+
+#Create a loop to calculate the mean near-surface temperature for each month
+for month in months:
+    #Organize the file path in the order of the month list for LGM and Modern Period
+    LGM_files = (LGM_filepath + str(month) + ".nc") 
+    MOD_files = (MOD_filepath + str(month) + ".nc") 
+    
+    #Open and label the netcdf files
+    LGMdata = Dataset(LGM_files)
+    MODdata = Dataset(MOD_files)
+
+    #Read in latitude data (same in both periods)
+    lats = LGMdata.variables['latitude'][:]
+    
+    #Create a list of mid-latitude boundaries
+    lat_bnds = [23, 66]  
+    lat_inds = np.where((lats > lat_bnds[0]) & (lats < lat_bnds[1])) # Create indexes to locate the position of the data in the file
+    lat_inds = np.squeeze(lat_inds) # Convert them into 1D array
+    
+    # Read in all the near-surface temperature values but only at the selected latitudes
+    LGMtemp_midlat = LGMdata.variables['temp_mm_srf'][:,:,lat_inds[0]: lat_inds[16]+1,:] #LGM period
+    MODtemp_midlat = MODdata.variables['temp_mm_srf'][:,:,lat_inds[0]: lat_inds[16]+1,:] # Modern period
+
+    # Average the mid latitude near-surface temperature data of each month over time, surface, selected latitudes and longitudes
+    mean_LGMtemp_midlat = np.mean(LGMtemp_midlat, axis = (0,1,2,3)) #LGM period
+    mean_MODtemp_midlat = np.mean(MODtemp_midlat, axis = (0,1,2,3)) #Modern period
+
+    #Convert from Kelving to Celcious for both periods
+    mean_LGMtemp_midlat = mean_LGMtemp_midlat - 273.15
+    mean_MODtemp_midlat = mean_MODtemp_midlat - 273.15
+    
+    # Prinnt the mean Northern Hemisphere mid-latitude near-surface temperature in degrees Celsius for each month 
+    print(mean_LGMtemp_midlat) #LGM
+    print(mean_MODtemp_midlat) #Modern
+    
+    #Return the data of each month into the LGM and MOD list
+    LGM.append(mean_LGMtemp_midlat)
+    MOD.append(mean_MODtemp_midlat)
+
+# Initiate a new figure
+fig = plt.figure()
+
+# Set a new axes calles ax1 with one plot
+ax1 = fig.add_subplot(1,1,1)
+
+# Plot LGM and Modern near-surface temperature values
+ax1.plot(months, LGM, 'b--*', label = 'LGM')
+ax1.plot(months, MOD, 'g--*', label='Modern')
+
+# Add a legend containing the two labels
+ax1.legend()
+
+#Add y and x axis labels
+ax1.set_ylabel(r'Near-Surface Temperature ($\degree$C)', fontsize=12)
+ax1.set_xlabel(r'Months', fontsize=12)
+
+# Add a title
+ax1.set_title(r'Mean Northern Hemisphere mid-latitude near-surface temperature for LGM and Modern Period', fontsize=14)
+
+#Show plot
+plt.show()
