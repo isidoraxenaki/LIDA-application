@@ -1,5 +1,5 @@
 #This code aims to calculate the heatwave occurrences in the Northern Hemisphere during the summer of 2010. This method is used in literature (Sutanto et al., 2020)
-#and it defines heatwaves when both daily maximum and minimum air temperatures at 2 m exceed the corresponding climatological 90th percentile for 3 days or longer
+#and it defines heatwaves when both daily maximum and minimum air temperatures at 2 m exceed the corresponding climatological 90th percentile for 3 days or longer (Source of Data: ERA 5)
 
 #Import essential packages
 import pandas as pd
