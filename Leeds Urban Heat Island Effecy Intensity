@@ -1,0 +1,76 @@
+#This code aims to calculate the difference of a 4-month average temperature across the diurnal cycle between a rural site and a suburban site station in Leeds (Urban Heat Island Effect)
+#The rural site is an average of nine weather stations (colour names) placed in Leeds SPEN Farm within different microenvironments (e.g., woodland, soil field, grass field, next to A64 road ect.)
+#and they were placed there as part of a master's research project module
+#The suburban site is located in Parnaby Road, close to the city center, and it consists of a Met Office weather observation remote network
+
+#Import essential packages
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+from datetime import datetime
+import matplotlib as mpl
+
+#Read csv file for all stations (Field Measurements)
+met_data = pd.read_csv('C:/Users/user/Desktop/Observation of Weather and Climate/All_Stations_Data.csv', delimiter= ';')
+
+#Create the path to read for Parnaby Road Data (Suburban Station Measurement)
+path = 'C:/Users/user/Desktop/Observation of Weather and Climate/Parnaby Rd Data'
+extension = '.csv'
+
+#Read all files for Parnaby Road Data
+files = [file for file in os.listdir(path) if file.endswith(extension)]
+
+#Merge CSV Files (They could only be dowloaded in monthly files and this assessment needed 4 months of data)
+all_Parnaby_Data = []
+
+for file in files:
+    df = pd.read_csv(os.path.join(path, file))
+    all_Parnaby_Data.append(df)
+
+Parnaby_Data = pd.concat(all_Parnaby_Data, ignore_index=True)
+
+
+# Make our timestamps the first column of the data so we can navigate around using the date time
+met_data.index =  pd.to_datetime(met_data['Timestamp'], format ='mixed')
+Parnaby_Data.index =  pd.to_datetime(Parnaby_Data['Report Date / Time'], format ='mixed')
+
+#Ignore dataframe errors
+met_data = met_data.drop(columns=['Timestamp'], errors='ignore')
+Parnaby_Data = Parnaby_Data.drop(columns=['Report Date / Time'], errors='ignore')
+
+#Read Temperature data 
+met_data = met_data[['Green - Temperature', 'Orange - Temperature','Blue - Temperature','Black - Temperature','Indigo - Temperature','Red - Temperature', 'Brown - Temperature', 'Violet - Temperature', 'White - Temperature']] #Field Stations had colour names
+Parnaby_Data = Parnaby_Data[['Air Temperature']] #Suburban Station
+
+#Covert to numeric type
+met_data_rural_av = met_data.apply(pd.to_numeric, errors='coerce')
+Parnaby_Data_av = Parnaby_Data.apply(pd.to_numeric, errors='coerce')
+
+#average over rows and skip nan values (obtain an average of all stations in sites)
+met_data_rural_av = met_data_rural_av.mean(axis= (1), skipna=True) 
+Parnaby_Data_av = Parnaby_Data_av.mean(axis= (1), skipna=True)
+
+#Resample for diunal cicle
+met_data_rs = met_data_rural_av.groupby(met_data_rural_av.index.hour).mean()
+Parnaby_Data_rs = Parnaby_Data_av.groupby(Parnaby_Data_av.index.hour).mean()
+
+Intensity = Parnaby_Data_rs - met_data_rs
+
+#Initiate a figure
+fig = plt.figure(figsize= (14,5))
+
+# Set a new axes called ax1 with one plot
+ax1 = fig.add_subplot(1,1,1)
+
+# Plot Variables
+ax1.plot(Intensity, color = 'b')
+
+#Plot grid
+plt.grid()
+
+#Add y and x axis labels
+ax1.set_ylabel(r'Air Temperature ($\degree$C)', fontsize=12)
+ax1.set_xlabel(r'Hour of the Diurnal Cycle', fontsize=12)
+
+#Show the Plot
+plt.show()
